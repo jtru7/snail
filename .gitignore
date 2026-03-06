@@ -1,0 +1,13 @@
+# Environment / secrets
+.env
+config.local.js
+secrets.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.suo
+*.user
