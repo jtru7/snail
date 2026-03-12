@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnAIl Race</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <div id="error-toast" class="toast hidden"></div>
+
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-left">
+      <span class="mascot" id="mascot">🐌</span>
+      <h1 class="app-title">Sn<span class="ai-highlight">AI</span>l Race</h1>
+    </div>
+    <div class="header-right">
+      <div id="user-info" class="user-info"></div>
+      <button id="signout-btn" class="btn btn-ghost hidden" onclick="signOut()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <nav id="app-nav" class="hidden">
+    <button class="nav-btn" data-view="timer"       onclick="showView('timer');       loadTimer()">⏱ Timer</button>
+    <button class="nav-btn" data-view="journal"     onclick="showView('journal');     loadJournal()">📓 Journal</button>
+    <button class="nav-btn" data-view="leaderboard" onclick="showView('leaderboard'); loadLeaderboard()">🏆 Leaderboard</button>
+    <button class="nav-btn" data-view="badges"      onclick="showView('badges');      loadBadges()">🏅 Badges</button>
+    <button class="nav-btn hidden" data-view="admin" onclick="showView('admin');      loadAdmin()">⚙️ Admin</button>
+  </nav>
+
+  <!-- Views -->
+  <main id="app-main">
+
+    <!-- Login -->
+    <div id="view-login" class="view">
+      <div class="login-card">
+        <div class="login-mascot">🐌</div>
+        <h2>Sn<span class="ai-highlight">AI</span>l Race</h2>
+        <p class="login-subtitle">Log 10 intentional AI hours.<br>Try not to lose to your colleagues.</p>
+        <div id="google-signin-btn"></div>
+        <p class="login-hint">Sign in with your BYU-Idaho Google account.</p>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div id="view-timer" class="view hidden">
+      <div id="timer-content"><div class="loading-spinner">Loading...</div></div>
+    </div>
+
+    <!-- Journal -->
+    <div id="view-journal" class="view hidden">
+      <div id="journal-content"><div class="loading-spinner">Loading...</div></div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="view-leaderboard" class="view hidden">
+      <div id="leaderboard-content"><div class="loading-spinner">Loading...</div></div>
+    </div>
+
+    <!-- Badges -->
+    <div id="view-badges" class="view hidden">
+      <div id="badges-content"><div class="loading-spinner">Loading...</div></div>
+    </div>
+
+    <!-- Admin -->
+    <div id="view-admin" class="view hidden">
+      <div id="admin-content"><div class="loading-spinner">Loading...</div></div>
+    </div>
+
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/journal.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/badges.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+</html>
