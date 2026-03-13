@@ -313,6 +313,42 @@ body {
   text-align: center;
 }
 
+/* ── Inputs ──────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--green);
+  background: white;
+}
+
+/* ── Log list ────────────────────────────────────────────── */
+.log-item {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.log-item:last-child { border-bottom: none; }
+
+.log-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.log-date  { font-weight: 700; font-size: 0.85rem; }
+.log-notes { font-size: 0.85rem; color: var(--text-light); margin-top: 0.2rem; }
+.log-dur   { font-weight: 800; font-size: 0.95rem; color: var(--green-dark); white-space: nowrap; }
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 480px) {
   .app-title    { font-size: 1.2rem; }
