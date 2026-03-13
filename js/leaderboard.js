@@ -17,27 +17,48 @@ async function loadLeaderboard() {
 
   try {
     const data = await api('getLeaderboard', {}, 'GET');
-    renderLeaderboard(data, user);
+
+    // Fetch badges for all users in parallel
+    const allEntries = [...data.tenHourClub, ...data.leaderboard];
+    const badgeResults = await Promise.all(
+      allEntries.map(e => api('getUserBadges', { userId: e.userId }, 'GET').catch(() => []))
+    );
+
+    // Build userId -> earned emoji array map
+    const badgeMap = {};
+    allEntries.forEach((e, i) => {
+      const earned = badgeResults[i] || [];
+      badgeMap[e.userId] = earned.map(b => {
+        const meta = ALL_BADGES.find(a => a.type === b.badgeType);
+        return meta ? meta.emoji : null;
+      }).filter(Boolean);
+    });
+
+    renderLeaderboard(data, user, badgeMap);
   } catch (e) {
     document.getElementById('leaderboard-content').innerHTML =
       `<div class="card"><p style="color:var(--red)">Error: ${e.message}</p></div>`;
   }
 }
 
-function renderLeaderboard({ leaderboard, tenHourClub }, currentUser) {
+function renderLeaderboard({ leaderboard, tenHourClub }, currentUser, badgeMap = {}) {
   const html = [];
 
   // ── 10 Hour Club ─────────────────────────────────────────
   if (tenHourClub.length > 0) {
     const members = tenHourClub.map(entry => {
-      const isMe = entry.userId === currentUser.userId;
+      const isMe   = entry.userId === currentUser.userId;
+      const badges = renderBadgePips(badgeMap[entry.userId]);
       return `
         <div class="lb-row club-row ${isMe ? 'lb-me' : ''}">
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <span class="lb-rank">🏆</span>
             <img src="${entry.photoUrl || ''}" alt="${escLb(entry.name)}" class="avatar"
               onerror="this.style.display='none'">
-            <span class="lb-name">${escLb(entry.name)}${isMe ? ' <span class="lb-you">you</span>' : ''}</span>
+            <div>
+              <span class="lb-name">${escLb(entry.name)}${isMe ? ' <span class="lb-you">you</span>' : ''}</span>
+              ${badges}
+            </div>
           </div>
           <span class="lb-hours club-hours">${entry.totalHours}h</span>
         </div>
@@ -64,9 +85,10 @@ function renderLeaderboard({ leaderboard, tenHourClub }, currentUser) {
     `);
   } else if (leaderboard.length > 0) {
     const rows = leaderboard.map(entry => {
-      const isMe  = entry.userId === currentUser.userId;
-      const pct   = Math.min(100, (entry.totalMinutes / 600) * 100).toFixed(0);
-      const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : null;
+      const isMe   = entry.userId === currentUser.userId;
+      const pct    = Math.min(100, (entry.totalMinutes / 600) * 100).toFixed(0);
+      const medal  = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : null;
+      const badges = renderBadgePips(badgeMap[entry.userId]);
 
       return `
         <div class="lb-row ${isMe ? 'lb-me' : ''}">
@@ -79,6 +101,7 @@ function renderLeaderboard({ leaderboard, tenHourClub }, currentUser) {
               <div class="progress-wrap" style="height:6px; width:120px; margin-top:4px;">
                 <div class="progress-fill" style="width:${pct}%;"></div>
               </div>
+              ${badges}
             </div>
           </div>
           <span class="lb-hours">${entry.totalHours}h <span style="font-size:0.75rem; color:var(--text-light); font-weight:400;">/ 10</span></span>
@@ -106,6 +129,11 @@ function renderLeaderboard({ leaderboard, tenHourClub }, currentUser) {
   }
 
   document.getElementById('leaderboard-content').innerHTML = html.join('');
+}
+
+function renderBadgePips(emojis) {
+  if (!emojis || emojis.length === 0) return '';
+  return `<div class="lb-badges">${emojis.map(e => `<span class="lb-badge-pip" title="${e}">${e}</span>`).join('')}</div>`;
 }
 
 function escLb(str) {
