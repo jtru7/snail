@@ -7,7 +7,7 @@ const ALL_BADGES = [
   { type: 'hours_5',         emoji: '⚡',  label: '5 Hours',          description: 'Halfway there — 5 hours logged.' },
   { type: 'hours_10',        emoji: '🏆',  label: '10 Hour Club',     description: 'Challenge complete! 10 hours logged.' },
   { type: 'streak_5',        emoji: '🔥',  label: '5-Day Streak',     description: '5 consecutive workdays with a log.' },
-  { type: 'weekend_warrior', emoji: '🌟',  label: 'Weekend Warrior',  description: 'Logged time on a weekend.' },
+  { type: 'weekend_warrior', emoji: '🛡️',  label: 'Weekend Warrior',  description: 'Logged time on a weekend.' },
   { type: 'posts_5',         emoji: '📝',  label: 'Prolific Poster',  description: '5 shared journal entries.' },
   { type: 'posts_10',        emoji: '📚',  label: 'Storyteller',      description: '10 shared journal entries.' },
   { type: 'posts_20',        emoji: '🌍',  label: 'Community Pillar', description: '20 shared journal entries.' },
