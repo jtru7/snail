@@ -254,18 +254,68 @@ function copyJoinCode(code) {
 
 // ── CSV export helper ────────────────────────────────────────
 function downloadCohortCSV(data, cohortName) {
-  const userMap = {};
-  data.users.forEach(u => { userMap[u.userId] = u; });
+  const slug = cohortName.replace(/\s+/g, '_');
 
-  const rows = [
+  // Build per-user aggregates
+  const userMap     = {};
+  const minutesMap  = {};
+  const badgeMap    = {};
+  const sharedMap   = {};
+
+  data.users.forEach(u => {
+    userMap[u.userId]    = u;
+    minutesMap[u.userId] = 0;
+    badgeMap[u.userId]   = 0;
+    sharedMap[u.userId]  = 0;
+  });
+
+  data.timeLogs.forEach(log => {
+    if (minutesMap[log.userId] !== undefined) {
+      minutesMap[log.userId] += Number(log.durationMinutes || 0);
+    }
+  });
+
+  data.badges.forEach(b => {
+    if (badgeMap[b.userId] !== undefined) badgeMap[b.userId]++;
+  });
+
+  data.journalEntries.forEach(e => {
+    const v = e.isShared;
+    if ((v === true || v === 'TRUE' || v === 'true') && sharedMap[e.userId] !== undefined) {
+      sharedMap[e.userId]++;
+    }
+  });
+
+  // ── File 1: Summary (one row per user) ──────────────────
+  const summaryRows = [
+    ['Name', 'Email', 'Total Minutes', 'Total Hours', 'Reached 10hrs?', 'Badges Earned', 'Journal Posts Shared', 'Join Date'],
+    ...data.users.map(u => {
+      const mins = minutesMap[u.userId] || 0;
+      const hrs  = (mins / 60).toFixed(2);
+      return [
+        u.name       || '',
+        u.email      || '',
+        mins,
+        hrs,
+        mins >= 600 ? 'Yes' : 'No',
+        badgeMap[u.userId]  || 0,
+        sharedMap[u.userId] || 0,
+        u.joinDate ? new Date(u.joinDate).toLocaleDateString() : '',
+      ];
+    })
+  ];
+  triggerCSVDownload(summaryRows, `${slug}_summary.csv`);
+
+  // ── File 2: Detailed time logs ───────────────────────────
+  const logRows = [
     ['Name', 'Email', 'Date', 'Duration (min)', 'Duration (hrs)', 'Notes', 'Retro?'],
     ...data.timeLogs.map(log => {
       const u    = userMap[log.userId] || {};
       const date = log.startTime ? new Date(log.startTime).toLocaleDateString() : '';
-      const hrs  = log.durationMinutes ? (log.durationMinutes / 60).toFixed(2) : '0';
+      const hrs  = (Number(log.durationMinutes || 0) / 60).toFixed(2);
       return [
-        u.name    || '',
-        u.email   || '',
+        u.name  || '',
+        u.email || '',
         date,
         log.durationMinutes || 0,
         hrs,
@@ -274,13 +324,16 @@ function downloadCohortCSV(data, cohortName) {
       ];
     })
   ];
+  triggerCSVDownload(logRows, `${slug}_time_logs.csv`);
+}
 
-  const csv     = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
-  const blob    = new Blob([csv], { type: 'text/csv' });
-  const url     = URL.createObjectURL(blob);
-  const a       = document.createElement('a');
-  a.href        = url;
-  a.download    = `${cohortName.replace(/\s+/g, '_')}_time_logs.csv`;
+function triggerCSVDownload(rows, filename) {
+  const csv  = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
