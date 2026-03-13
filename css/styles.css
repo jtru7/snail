@@ -412,6 +412,76 @@ body {
   word-break: break-word;
 }
 
+/* ── Leaderboard ─────────────────────────────────────────── */
+.lb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 0.5rem;
+}
+.lb-row:last-child { border-bottom: none; }
+
+.lb-me {
+  background: var(--green-bg);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.75rem;
+  margin: 0 -0.75rem;
+}
+
+.club-row { background: #FFF9E6; border-radius: var(--radius); padding: 0.75rem; margin: 0 -0.5rem 0.25rem; }
+
+.lb-rank  { font-size: 1.1rem; font-weight: 800; min-width: 2rem; text-align: center; }
+.lb-name  { font-weight: 600; font-size: 0.92rem; }
+.lb-hours { font-weight: 800; font-size: 1rem; color: var(--green-dark); white-space: nowrap; }
+.club-hours { color: #7A4F00; }
+
+.lb-you {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--green);
+  color: white;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  vertical-align: middle;
+  margin-left: 0.25rem;
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.badge-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 2px solid transparent;
+  transition: transform 0.15s;
+}
+
+.badge-earned {
+  border-color: var(--green);
+}
+.badge-earned:hover { transform: translateY(-2px); }
+
+.badge-locked {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.badge-emoji { font-size: 2.2rem; margin-bottom: 0.4rem; }
+.badge-label { font-weight: 800; font-size: 0.85rem; margin-bottom: 0.25rem; }
+.badge-desc  { font-size: 0.75rem; color: var(--text-light); line-height: 1.4; margin-bottom: 0.5rem; }
+.badge-date  { font-size: 0.72rem; font-weight: 700; color: var(--green-dark); }
+.badge-date-locked { color: var(--text-light); font-weight: 400; }
+
 /* ── Admin ───────────────────────────────────────────────── */
 .admin-tabs {
   display: flex;
