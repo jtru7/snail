@@ -349,6 +349,85 @@ body {
 .log-notes { font-size: 0.85rem; color: var(--text-light); margin-top: 0.2rem; }
 .log-dur   { font-weight: 800; font-size: 0.95rem; color: var(--green-dark); white-space: nowrap; }
 
+/* ── Admin ───────────────────────────────────────────────── */
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 0.6rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-light);
+  transition: all 0.15s;
+}
+.admin-tab.active { border-color: var(--green); color: var(--green-dark); background: var(--green-bg); }
+.admin-tab:hover:not(.active) { border-color: var(--text-light); color: var(--text); }
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.admin-row:last-child { border-bottom: none; }
+
+.join-code {
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: border-color 0.15s;
+}
+.join-code:hover { border-color: var(--green); }
+
+.role-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.role-admin { background: #FEE9C7; color: #7A4F00; }
+.role-user  { background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 480px) {
   .app-title    { font-size: 1.2rem; }
