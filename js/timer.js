@@ -163,6 +163,9 @@ function renderActiveSession() {
       <button class="btn btn-danger" style="width:100%; margin-top:0.75rem;" onclick="doClockOut()">
         ⏹ Clock Out
       </button>
+      <button class="btn-abandon" onclick="doAbandonSession()">
+        Discard this session
+      </button>
     </div>
   `;
 }
@@ -317,6 +320,19 @@ async function doClockOut() {
   } catch (e) {
     showError(e.message);
     if (btn) { btn.disabled = false; btn.textContent = '⏹ Clock Out'; }
+  }
+}
+
+async function doAbandonSession() {
+  if (!confirm('Discard this session? No time will be logged.')) return;
+
+  try {
+    await api('deleteTimeLog', { logId: _activeSession.logId });
+    _activeSession = null;
+    document.title = 'SnAIl Race';
+    renderTimer();
+  } catch (e) {
+    showError(e.message);
   }
 }
 

@@ -331,6 +331,21 @@ body {
   background: white;
 }
 
+/* ── Abandon session ─────────────────────────────────────── */
+.btn-abandon {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  color: var(--text-light);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem;
+}
+.btn-abandon:hover { color: var(--red); }
+
 /* ── Share checkbox ──────────────────────────────────────── */
 .share-checkbox-label {
   display: flex;
