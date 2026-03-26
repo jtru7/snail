@@ -331,6 +331,24 @@ body {
   background: white;
 }
 
+/* ── Share checkbox ──────────────────────────────────────── */
+.share-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  user-select: none;
+}
+.share-checkbox-label input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
 /* ── Log list ────────────────────────────────────────────── */
 .log-item {
   padding: 0.75rem 0.5rem;

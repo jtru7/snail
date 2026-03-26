@@ -153,8 +153,11 @@ function renderActiveSession() {
         00:00:00
       </div>
       <textarea id="clock-out-notes" class="input" placeholder="What did you work on? (optional)"
-        rows="2" style="width:100%; margin-bottom:0.75rem; resize:none;"></textarea>
-      <button class="btn btn-danger" style="width:100%;" onclick="doClockOut()">
+        rows="2" style="width:100%; margin-bottom:0.5rem; resize:none;"></textarea>
+      <label class="share-checkbox-label">
+        <input type="checkbox" id="clock-out-share"> Share notes to Community Feed
+      </label>
+      <button class="btn btn-danger" style="width:100%; margin-top:0.75rem;" onclick="doClockOut()">
         ⏹ Clock Out
       </button>
     </div>
@@ -182,6 +185,9 @@ function renderRetroForm() {
       <label style="font-size:0.85rem; font-weight:600;">Notes (optional)
         <textarea id="retro-notes" class="input" rows="2" style="display:block; margin-top:0.25rem; width:100%; resize:none;"
           placeholder="What did you work on?"></textarea>
+      </label>
+      <label class="share-checkbox-label">
+        <input type="checkbox" id="retro-share"> Share notes to Community Feed
       </label>
       <button class="btn btn-primary" onclick="doAddRetroLog()">Add Entry</button>
     </div>
@@ -291,8 +297,9 @@ async function doClockIn() {
 }
 
 async function doClockOut() {
-  const notes = document.getElementById('clock-out-notes')?.value.trim() || '';
-  const btn   = document.querySelector('#clock-card .btn-danger');
+  const notes  = document.getElementById('clock-out-notes')?.value.trim() || '';
+  const share  = document.getElementById('clock-out-share')?.checked && notes;
+  const btn    = document.querySelector('#clock-card .btn-danger');
   if (btn) { btn.disabled = true; btn.textContent = 'Clocking out...'; }
 
   try {
@@ -300,7 +307,8 @@ async function doClockOut() {
     _activeSession = null;
     _timeLogs.unshift(log);
     document.title = 'SnAIl Race';
-    showSuccess(`Logged ${log.durationMinutes} minutes!`);
+    if (share) await shareNotesToCommunity(notes);
+    showSuccess(`Logged ${log.durationMinutes} minutes!${share ? ' Shared to Community.' : ''}`);
     renderTimer();
   } catch (e) {
     showError(e.message);
@@ -312,6 +320,7 @@ async function doAddRetroLog() {
   const startTime = document.getElementById('retro-start').value;
   const endTime   = document.getElementById('retro-end').value;
   const notes     = document.getElementById('retro-notes').value.trim();
+  const share     = document.getElementById('retro-share')?.checked && notes;
 
   if (!startTime || !endTime) { showError('Start and end times are required.'); return; }
 
@@ -325,11 +334,21 @@ async function doAddRetroLog() {
       notes,
     });
     _timeLogs.unshift(log);
-    showSuccess(`Retro log added (${log.durationMinutes} min)`);
+    if (share) await shareNotesToCommunity(notes);
+    showSuccess(`Retro log added (${log.durationMinutes} min)${share ? ' · Shared to Community.' : ''}`);
     renderTimer();
   } catch (e) {
     showError(e.message);
     btn.disabled = false; btn.textContent = 'Add Entry';
+  }
+}
+
+async function shareNotesToCommunity(content) {
+  try {
+    const entry = await api('createEntry', { content });
+    await api('shareEntry', { entryId: entry.entryId });
+  } catch (_) {
+    // Sharing is best-effort — don't block the timer flow
   }
 }
 
