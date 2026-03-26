@@ -5,6 +5,7 @@
 let _timerInterval  = null;
 let _activeSession  = null;
 let _timeLogs       = [];
+let _knownBadgeTypes = new Set();
 
 const NUDGES = [
   "Still thinking about starting? Bold strategy.",
@@ -28,12 +29,14 @@ async function loadTimer() {
   document.getElementById('timer-content').innerHTML = '<div class="loading-spinner">Loading...</div>';
 
   try {
-    const [sessionRes, logs] = await Promise.all([
+    const [sessionRes, logs, badges] = await Promise.all([
       api('getActiveSession', {}),
       api('getTimeLogs', {}),
+      api('getUserBadges', {}, 'GET'),
     ]);
-    _activeSession = sessionRes.session;
-    _timeLogs      = logs;
+    _activeSession   = sessionRes.session;
+    _timeLogs        = logs;
+    _knownBadgeTypes = new Set(badges.map(b => b.badgeType));
     renderTimer();
   } catch (e) {
     document.getElementById('timer-content').innerHTML =
@@ -310,6 +313,7 @@ async function doClockOut() {
     if (share) await shareNotesToCommunity(notes);
     showSuccess(`Logged ${log.durationMinutes} minutes!${share ? ' Shared to Community.' : ''}`);
     renderTimer();
+    await checkForNewBadges();
   } catch (e) {
     showError(e.message);
     if (btn) { btn.disabled = false; btn.textContent = '⏹ Clock Out'; }
@@ -337,10 +341,50 @@ async function doAddRetroLog() {
     if (share) await shareNotesToCommunity(notes);
     showSuccess(`Retro log added (${log.durationMinutes} min)${share ? ' · Shared to Community.' : ''}`);
     renderTimer();
+    await checkForNewBadges();
   } catch (e) {
     showError(e.message);
     btn.disabled = false; btn.textContent = 'Add Entry';
   }
+}
+
+async function checkForNewBadges() {
+  try {
+    const badges    = await api('getUserBadges', {}, 'GET');
+    const newBadges = badges.filter(b => !_knownBadgeTypes.has(b.badgeType));
+    _knownBadgeTypes = new Set(badges.map(b => b.badgeType));
+    if (newBadges.length > 0) showBadgeCelebration(newBadges);
+  } catch (_) {}
+}
+
+function showBadgeCelebration(newBadges) {
+  const items = newBadges.map(b => {
+    const meta = ALL_BADGES.find(a => a.type === b.badgeType) || {};
+    return `
+      <div class="badge-celebrate-item">
+        <div class="badge-celebrate-emoji">${meta.emoji || '🏅'}</div>
+        <div class="badge-celebrate-label">${meta.label || b.badgeType}</div>
+        <div class="badge-celebrate-desc">${meta.description || ''}</div>
+      </div>
+    `;
+  }).join('');
+
+  const el = document.createElement('div');
+  el.id = 'badge-celebration';
+  el.className = 'badge-celebration-overlay';
+  el.innerHTML = `
+    <div class="badge-celebration-box">
+      <div class="badge-celebration-title">
+        🎉 Badge${newBadges.length > 1 ? 's' : ''} Unlocked!
+      </div>
+      <div class="badge-celebrate-items">${items}</div>
+      <button class="btn btn-primary" style="width:100%; margin-top:1.25rem;"
+        onclick="document.getElementById('badge-celebration').remove()">
+        Let's go! 🐌
+      </button>
+    </div>
+  `;
+  document.body.appendChild(el);
 }
 
 async function shareNotesToCommunity(content) {
