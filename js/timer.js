@@ -262,13 +262,15 @@ function renderEditForm(log) {
 function startLiveClock() {
   const update = () => {
     const el = document.getElementById('live-clock');
-    if (!el) { clearInterval(_timerInterval); return; }
+    if (!el) { clearInterval(_timerInterval); document.title = 'SnAIl Race'; return; }
     const elapsed = Math.floor((Date.now() - new Date(_activeSession.startTime)) / 1000);
     const h = Math.floor(elapsed / 3600);
     const m = Math.floor((elapsed % 3600) / 60);
     const s = elapsed % 60;
     const pad = n => String(n).padStart(2, '0');
-    el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    const time = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    el.textContent = time;
+    document.title = `⏱ ${time} | SnAIl Race`;
   };
   update();
   _timerInterval = setInterval(update, 1000);
@@ -297,6 +299,7 @@ async function doClockOut() {
     const log = await api('clockOut', { notes });
     _activeSession = null;
     _timeLogs.unshift(log);
+    document.title = 'SnAIl Race';
     showSuccess(`Logged ${log.durationMinutes} minutes!`);
     renderTimer();
   } catch (e) {
